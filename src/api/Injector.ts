@@ -1,4 +1,4 @@
-import { InjectableClass, InjectableClassWithToken, InjectableFunction } from './Injectable.js';
+import { InjectableClass, InjectableFunction, KnownInjectableClass } from './Injectable.js';
 import { InjectionToken } from './InjectionToken.js';
 import { Scope } from './Scope.js';
 import { TChildContext } from './TChildContext.js';
@@ -47,10 +47,19 @@ export interface Injector<TContext = {}> {
     Class: InjectableClass<TContext, R, Tokens>,
     scope?: Scope,
   ): Injector<TChildContext<TContext, R, Token>>;
-  provideInjectableClass<Token extends string, R, Tokens extends readonly InjectionToken<TContext>[]>(
-    Class: InjectableClassWithToken<Token, TContext, R, Tokens>,
-    scope?: Scope
-  ): Injector<TChildContext<TContext, R, Token>>;
+  /**
+   * Create a child injector that can provide a value using instances of `Class` for internally registered token `'knownAs'`. The new child injector can resolve all tokens the parent injector can, as well as the new `'knownAs'` token.
+   * @param Class The class with internally registered token `'knownAs'` to instantiate to provide the value.
+   * @param scope Decide whether the value must be cached after the factory is invoked once. Use `Scope.Singleton` to enable caching (default), or `Scope.Transient` to disable caching.
+   */
+  provideClass<
+    KnownAsToken extends string,
+    R,
+    Tokens extends readonly InjectionToken<TContext>[],
+  >(
+    Class: KnownInjectableClass<TContext, R, Tokens, KnownAsToken>,
+    scope?: Scope,
+  ): Injector<TChildContext<TContext, R, KnownAsToken>>;
   /**
    * Create a child injector that can provide a value using `factory` for token `'token'`. The new child injector can resolve all tokens the parent injector can and the new `'token'`.
    * @param token The token to associate with the value.

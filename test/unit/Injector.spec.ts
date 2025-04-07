@@ -121,27 +121,31 @@ describe('InjectorImpl', () => {
       expect(actualBaz.bar.foo.target).eq(Bar);
     });
 
-    it('should be able to provide a target into a class with auto token classes', () => {
+    it('should be able to provide a target into a class with knownAs token', () => {
       // Arrange
       class Foo {
         constructor(public target: undefined | Function) {}
         public static inject = tokens(TARGET_TOKEN);
-        public static injectableAs = 'Foo' as const;
+        public static knownAs = 'Foo' as const;
       }
+
       class Bar {
         constructor(public target: undefined | Function, public foo: Foo) {}
-        public static inject = tokens(TARGET_TOKEN, Foo.injectableAs);
-        public static injectableAs = 'Bar' as const;
+        public static inject = tokens(TARGET_TOKEN, Foo.knownAs);
+        public static knownAs = 'Bar' as const;
       }
 
       class Baz {
         constructor(public bar: Bar, public target: Function | undefined) {}
-        public static inject = tokens(Bar.injectableAs, TARGET_TOKEN);
+        public static inject = tokens(Bar.knownAs, TARGET_TOKEN);
         public static injectableAs = 'Baz' as const;
       }
 
       // Act
-      const actualBaz = rootInjector.provideInjectableClass(Foo).provideInjectableClass(Bar).injectClass(Baz);
+      const actualBaz = rootInjector
+        .provideClass(Foo)
+        .provideClass(Bar)
+        .injectClass(Baz);
 
       // Assert
       expect(actualBaz.target).undefined;
@@ -700,7 +704,7 @@ describe('InjectorImpl', () => {
       expect(actual.log).eq(expectedLogger);
     });
 
-    it('should be able to inject a dependency tree with auto token classes', () => {
+    it('should be able to inject a dependency tree with classes with knownAs token', () => {
       // Arrange
       class Logger {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -710,13 +714,13 @@ describe('InjectorImpl', () => {
         public baz = 'qux';
         constructor(public log: Logger) {}
         public static inject = tokens('logger');
-        public static injectableAs = 'GrandChild' as const;
+        public static knownAs = 'GrandChild' as const;
       }
       class Child1 {
         public bar = 'foo';
         constructor(public log: Logger, public grandchild: GrandChild) {}
-        public static inject = tokens('logger', GrandChild.injectableAs);
-        public static injectableAs = 'Child1' as const;
+        public static inject = tokens('logger', GrandChild.knownAs);
+        public static knownAs = 'Child1' as const;
       }
       class Child2 {
         public foo = 'bar';
@@ -725,15 +729,15 @@ describe('InjectorImpl', () => {
       }
       class Parent {
         constructor(public readonly child: Child1, public readonly child2: Child2, public readonly log: Logger) {}
-        public static inject = tokens(Child1.injectableAs, 'child2', 'logger');
+        public static inject = tokens(Child1.knownAs, 'child2', 'logger');
       }
       const expectedLogger = new Logger();
 
       // Act
       const actual = rootInjector
         .provideValue('logger', expectedLogger)
-        .provideInjectableClass(GrandChild)
-        .provideInjectableClass(Child1)
+        .provideClass(GrandChild)
+        .provideClass(Child1)
         .provideClass('child2', Child2)
         .injectClass(Parent);
 

@@ -7,12 +7,17 @@ export type InjectableClass<
   Tokens extends readonly InjectionToken<TContext>[],
 > = ClassWithInjections<TContext, R, Tokens> | ClassWithoutInjections<R>;
 
-export type InjectableClassWithToken<Token, TContext, R, Tokens extends readonly InjectionToken<TContext>[]> = InjectableClass<
+export type KnownInjectableClass<
+  TContext,
+  R,
+  Tokens extends readonly InjectionToken<TContext>[],
+  KnownAsToken extends string,
+> = InjectableClass<
   TContext,
   R,
   Tokens
 > & {
-  readonly injectableAs: Token;
+  readonly knownAs: KnownAsToken;
 };
 
 export interface ClassWithInjections<
@@ -49,6 +54,8 @@ export type Injectable<
   TContext,
   R,
   Tokens extends readonly InjectionToken<TContext>[],
+  KnownAsToken extends string | undefined = undefined,
 > =
-  | InjectableClass<TContext, R, Tokens>
-  | InjectableFunction<TContext, R, Tokens>;
+  KnownAsToken extends string ? 
+    KnownInjectableClass<TContext, R, Tokens, KnownAsToken> :
+    InjectableClass<TContext, R, Tokens> | InjectableFunction<TContext, R, Tokens>;

@@ -11,7 +11,7 @@ import type {
   InjectableClass,
   InjectableFunction,
   Injectable,
-  InjectableClassWithToken
+  KnownInjectableClass,
 } from './api/Injectable.js';
 import type { Injector } from './api/Injector.js';
 import type { Disposable } from './api/Disposable.js';
@@ -106,7 +106,41 @@ abstract class AbstractInjector<TContext> implements Injector<TContext> {
     return provider;
   }
 
-  public provideClass<
+  provideClass<
+    Token extends string,
+    R,
+    Tokens extends readonly InjectionToken<TContext>[],
+  >(
+    token: Token,
+    Class: InjectableClass<TContext, R, Tokens>,
+    scope?: Scope,
+  ): Injector<TChildContext<TContext, R, Token>>;
+
+  provideClass<
+    KnownAsToken extends string,
+    R,
+    Tokens extends readonly InjectionToken<TContext>[],
+  >(
+    Class: KnownInjectableClass<TContext, R, Tokens, KnownAsToken>,
+    scope?: Scope,
+  ): Injector<TChildContext<TContext, R, KnownAsToken>>;
+
+  public provideClass(...args: any[]): any {
+    if (args[0] === "string") {
+      return this._provideClassWithToken(
+        args[0],
+        args[1],
+        args[2] ?? DEFAULT_SCOPE,
+      );
+    } else {
+      return this._provideClassWithKnownAs(
+        args[0],
+        args[1] ?? DEFAULT_SCOPE,
+      );
+    }
+  }
+
+  protected _provideClassWithToken<
     Token extends string,
     R,
     Tokens extends InjectionToken<TContext>[],
@@ -120,12 +154,21 @@ abstract class AbstractInjector<TContext> implements Injector<TContext> {
     this.childInjectors.add(provider as Injector<any>);
     return provider;
   }
-  public provideInjectableClass<Token extends string, R, Tokens extends InjectionToken<TContext>[]>(
-    Class: InjectableClassWithToken<Token, TContext, R, Tokens>,
-    scope = DEFAULT_SCOPE
-  ): AbstractInjector<TChildContext<TContext, R, Token>> {
-    return this.provideClass(Class.injectableAs, Class, scope);
+
+  protected _provideClassWithKnownAs<
+    KnownAsToken extends string,
+    R,
+    Tokens extends InjectionToken<TContext>[],
+  >(
+    Class: KnownInjectableClass<TContext, R, Tokens, KnownAsToken>,
+    scope = DEFAULT_SCOPE,
+  ): AbstractInjector<TChildContext<TContext, R, KnownAsToken>> {
+    this.throwIfDisposed(Class.knownAs);
+    const provider = new ClassProvider(this, Class.knownAs, scope, Class);
+    this.childInjectors.add(provider as Injector<any>);
+    return provider;
   }
+  
   public provideFactory<
     Token extends string,
     R,
