@@ -407,28 +407,28 @@ const foo = createInjector().inject(Foo);
 
 <a name="error-handling"></a>
 
-## ® Internally registered tokens
+## ® Internally registered tokens / Known Classes
 
-You can register class tokens internally in the classes that need to be provided, and then provide such classes by using the `provideInjectableClass` method. To implement the “injectable” class, add a `static injectableAs` property with a string literal value. This way, it is possible to create a hierarchy of class dependencies without relying on arbitrarily specified tokens, instead opting to consolidate said tokens within the classes themselves.
+You can register class tokens internally in the classes that need to be provided, and then provide such classes by using the `provideClass` method's overload. To implement the "Known Class", add a `static knownAs` property with a string literal value. This way, it is possible to create a hierarchy of class dependencies without relying on arbitrarily specified tokens, instead opting to consolidate said tokens within the classes themselves.
 
 ```ts
 import { createInjector } from 'typed-inject';
 
 class Foo {
-  static injectableAs = "FooToken" as const;
+  static knownAs = "FooToken" as const;
 }
 
 class Bar {
-  static injectableAs = "BarToken" as const;
+  static knownAs = "BarToken" as const;
 
-  static inject = [ Foo.injectableAs ] as const;
+  static inject = [ Foo.knownAs ] as const;
 
   constructor(foo: Foo) {}
 }
 
 const injector = createInjector()
-  .provideInjectableClass(Foo)
-  .provideInjectableClass(Bar);
+  .provideClass(Foo)
+  .provideClass(Bar);
 ```
 
 ## 😬 Error handling
