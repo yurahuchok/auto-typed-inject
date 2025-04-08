@@ -407,7 +407,7 @@ const foo = createInjector().inject(Foo);
 
 <a name="error-handling"></a>
 
-## ® Internally registered tokens / Known Classes and Known Factories
+## 🏷️ Internally registered tokens / Known Classes and Known Factories
 
 You can register class tokens internally in the classes that need to be provided, and then provide such classes by using the `provideClass` method's overload. To implement the "Known Class", add a `static knownAs` property with a string literal value. This way, it is possible to create a hierarchy of class dependencies without relying on arbitrarily specified tokens, instead opting to consolidate said tokens within the classes themselves.
 
