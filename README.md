@@ -23,6 +23,7 @@ _If you want to know more about how typed-inject works, please read [my blog art
 - [♻ Lifecycle control](#lifecycle-control)
 - [🚮 Disposing provided stuff](#disposing-provided-stuff)
 - [✨ Magic tokens](#magic-tokens)
+- [🏷️ Internally registered tokens](#internally-registered-tokens)
 - [😬 Error handling](#error-handling)
 - [📖 API reference](#api-reference)
 - [🤝 Commendation](#commendation)
@@ -405,7 +406,7 @@ class Foo {
 const foo = createInjector().inject(Foo);
 ```
 
-<a name="error-handling"></a>
+<a name="internally-registered-tokens"></a>
 
 ## 🏷️ Internally registered tokens / Known Classes and Known Factories
 
@@ -451,6 +452,8 @@ const injector = createInjector()
   .provideFactory(fooFactory)
   .provideFactory(barFactory);
 ```
+
+<a name="error-handling"></a>
 
 ## 😬 Error handling
 
