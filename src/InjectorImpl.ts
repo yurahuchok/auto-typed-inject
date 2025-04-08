@@ -127,7 +127,7 @@ abstract class AbstractInjector<TContext> implements Injector<TContext> {
   ): Injector<TChildContext<TContext, R, KnownAsToken>>;
 
   public provideClass(...args: any[]): any {
-    if (args[0] === 'string') {
+    if (typeof args[0] === 'string') {
       return this._provideClassWithToken(
         args[0],
         args[1],
@@ -187,7 +187,7 @@ abstract class AbstractInjector<TContext> implements Injector<TContext> {
   ): Injector<TChildContext<TContext, R, KnownAsToken>>;
 
   public provideFactory(...args: any[]): any {
-    if (args[0] === 'string') {
+    if (typeof args[0] === 'string') {
       return this._provideFactoryWithToken(
         args[0],
         args[1],
