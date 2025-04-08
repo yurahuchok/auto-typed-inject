@@ -1,4 +1,9 @@
-import { InjectableClass, InjectableFunction, KnownInjectableClass, KnownInjectableFunction } from './Injectable.js';
+import {
+  InjectableClass,
+  InjectableFunction,
+  KnownInjectableClass,
+  KnownInjectableFunction,
+} from './Injectable.js';
 import { InjectionToken } from './InjectionToken.js';
 import { Scope } from './Scope.js';
 import { TChildContext } from './TChildContext.js';

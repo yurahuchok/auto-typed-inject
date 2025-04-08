@@ -127,17 +127,14 @@ abstract class AbstractInjector<TContext> implements Injector<TContext> {
   ): Injector<TChildContext<TContext, R, KnownAsToken>>;
 
   public provideClass(...args: any[]): any {
-    if (args[0] === "string") {
+    if (args[0] === 'string') {
       return this._provideClassWithToken(
         args[0],
         args[1],
         args[2] ?? DEFAULT_SCOPE,
       );
     } else {
-      return this._provideClassWithKnownAs(
-        args[0],
-        args[1] ?? DEFAULT_SCOPE,
-      );
+      return this._provideClassWithKnownAs(args[0], args[1] ?? DEFAULT_SCOPE);
     }
   }
 
@@ -190,20 +187,17 @@ abstract class AbstractInjector<TContext> implements Injector<TContext> {
   ): Injector<TChildContext<TContext, R, KnownAsToken>>;
 
   public provideFactory(...args: any[]): any {
-    if (args[0] === "string") {
+    if (args[0] === 'string') {
       return this._provideFactoryWithToken(
         args[0],
         args[1],
         args[2] ?? DEFAULT_SCOPE,
       );
     } else {
-      return this._provideFactoryWithKnownAs(
-        args[0],
-        args[1] ?? DEFAULT_SCOPE,
-      );
+      return this._provideFactoryWithKnownAs(args[0], args[1] ?? DEFAULT_SCOPE);
     }
   }
-  
+
   protected _provideFactoryWithToken<
     Token extends string,
     R,

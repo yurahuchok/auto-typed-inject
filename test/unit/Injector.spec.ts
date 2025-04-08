@@ -157,13 +157,19 @@ describe('InjectorImpl', () => {
       }
 
       class Bar {
-        constructor(public target: undefined | Function, public foo: Foo) {}
+        constructor(
+          public target: undefined | Function,
+          public foo: Foo,
+        ) {}
         public static inject = tokens(TARGET_TOKEN, Foo.knownAs);
         public static knownAs = 'Bar' as const;
       }
 
       class Baz {
-        constructor(public bar: Bar, public target: Function | undefined) {}
+        constructor(
+          public bar: Bar,
+          public target: Function | undefined,
+        ) {}
         public static inject = tokens(Bar.knownAs, TARGET_TOKEN);
         public static injectableAs = 'Baz' as const;
       }
@@ -745,7 +751,10 @@ describe('InjectorImpl', () => {
       }
       class Child1 {
         public bar = 'foo';
-        constructor(public log: Logger, public grandchild: GrandChild) {}
+        constructor(
+          public log: Logger,
+          public grandchild: GrandChild,
+        ) {}
         public static inject = tokens('logger', GrandChild.knownAs);
         public static knownAs = 'Child1' as const;
       }
@@ -755,7 +764,11 @@ describe('InjectorImpl', () => {
         public static inject = tokens('logger');
       }
       class Parent {
-        constructor(public readonly child: Child1, public readonly child2: Child2, public readonly log: Logger) {}
+        constructor(
+          public readonly child: Child1,
+          public readonly child2: Child2,
+          public readonly log: Logger,
+        ) {}
         public static inject = tokens(Child1.knownAs, 'child2', 'logger');
       }
       const expectedLogger = new Logger();
