@@ -1075,7 +1075,7 @@ describe('InjectorImpl', () => {
       const expectedCause = Error('Expected error');
       class GrandChild {
         public baz = 'baz';
-        public static knownAs = 'GrandChild' as const;
+        public static knownAs = 'GrandChildToken' as const;
         constructor() {
           throw expectedCause;
         }
@@ -1084,12 +1084,12 @@ describe('InjectorImpl', () => {
         public bar = 'foo';
         constructor(public grandchild: GrandChild) {}
         public static inject = tokens(GrandChild.knownAs);
-        public static knownAs = 'Child' as const;
+        public static knownAs = 'ChildToken' as const;
       }
       class Parent {
         constructor(public readonly child: Child) {}
         public static inject = tokens(Child.knownAs);
-        public static knownAs = 'Parent' as const;
+        public static knownAs = 'ParentToken' as const;
       }
 
       // Act
@@ -1104,8 +1104,8 @@ describe('InjectorImpl', () => {
         .throws(InjectionError)
         .which.deep.includes({
           message:
-            'Could not inject [class Parent] -> [token "Child"] -> [class Child] -> [token "GrandChild"] -> [class GrandChild]. Cause: Expected error',
-          path: [Parent, 'Child', Child, 'GrandChild', GrandChild],
+            'Could not inject [class Parent] -> [token "ChildToken"] -> [class Child] -> [token "GrandChildToken"] -> [class GrandChild]. Cause: Expected error',
+          path: [Parent, 'ChildToken', Child, 'GrandChildToken', GrandChild],
         });
     });
   });
