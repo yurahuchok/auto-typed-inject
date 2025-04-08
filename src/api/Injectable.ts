@@ -39,6 +39,19 @@ export type InjectableFunction<
   | InjectableFunctionWithInject<TContext, R, Tokens>
   | InjectableFunctionWithoutInject<R>;
 
+export type KnownInjectableFunction<
+  TContext,
+  R,
+  Tokens extends readonly InjectionToken<TContext>[],
+  KnownAsToken extends string,
+> = InjectableFunction<
+  TContext,
+  R,
+  Tokens
+> & {
+  readonly knownAs: KnownAsToken;
+};
+
 export interface InjectableFunctionWithInject<
   TContext,
   R,
@@ -56,6 +69,10 @@ export type Injectable<
   Tokens extends readonly InjectionToken<TContext>[],
   KnownAsToken extends string | undefined = undefined,
 > =
-  KnownAsToken extends string ? 
-    KnownInjectableClass<TContext, R, Tokens, KnownAsToken> :
-    InjectableClass<TContext, R, Tokens> | InjectableFunction<TContext, R, Tokens>;
+  KnownAsToken extends string 
+    ? 
+    KnownInjectableClass<TContext, R, Tokens, KnownAsToken> |
+    KnownInjectableFunction<TContext, R, Tokens, KnownAsToken> 
+    :
+    InjectableClass<TContext, R, Tokens> |
+    InjectableFunction<TContext, R, Tokens>;

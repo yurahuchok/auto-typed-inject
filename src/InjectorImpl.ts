@@ -12,6 +12,7 @@ import type {
   InjectableFunction,
   Injectable,
   KnownInjectableClass,
+  KnownInjectableFunction,
 } from './api/Injectable.js';
 import type { Injector } from './api/Injector.js';
 import type { Disposable } from './api/Disposable.js';
@@ -168,8 +169,42 @@ abstract class AbstractInjector<TContext> implements Injector<TContext> {
     this.childInjectors.add(provider as Injector<any>);
     return provider;
   }
+
+  provideFactory<
+    Token extends string,
+    R,
+    Tokens extends readonly InjectionToken<TContext>[],
+  >(
+    token: Token,
+    factory: InjectableFunction<TContext, R, Tokens>,
+    scope?: Scope,
+  ): Injector<TChildContext<TContext, R, Token>>;
+
+  provideFactory<
+    KnownAsToken extends string,
+    R,
+    Tokens extends readonly InjectionToken<TContext>[],
+  >(
+    factory: KnownInjectableFunction<TContext, R, Tokens, KnownAsToken>,
+    scope?: Scope,
+  ): Injector<TChildContext<TContext, R, KnownAsToken>>;
+
+  public provideFactory(...args: any[]): any {
+    if (args[0] === "string") {
+      return this._provideFactoryWithToken(
+        args[0],
+        args[1],
+        args[2] ?? DEFAULT_SCOPE,
+      );
+    } else {
+      return this._provideFactoryWithKnownAs(
+        args[0],
+        args[1] ?? DEFAULT_SCOPE,
+      );
+    }
+  }
   
-  public provideFactory<
+  protected _provideFactoryWithToken<
     Token extends string,
     R,
     Tokens extends InjectionToken<TContext>[],
@@ -180,6 +215,20 @@ abstract class AbstractInjector<TContext> implements Injector<TContext> {
   ): AbstractInjector<TChildContext<TContext, R, Token>> {
     this.throwIfDisposed(token);
     const provider = new FactoryProvider(this, token, scope, factory);
+    this.childInjectors.add(provider as Injector<any>);
+    return provider;
+  }
+
+  protected _provideFactoryWithKnownAs<
+    KnownAsToken extends string,
+    R,
+    Tokens extends InjectionToken<TContext>[],
+  >(
+    factory: KnownInjectableFunction<TContext, R, Tokens, KnownAsToken>,
+    scope = DEFAULT_SCOPE,
+  ): AbstractInjector<TChildContext<TContext, R, KnownAsToken>> {
+    this.throwIfDisposed(factory.knownAs);
+    const provider = new FactoryProvider(this, factory.knownAs, scope, factory);
     this.childInjectors.add(provider as Injector<any>);
     return provider;
   }

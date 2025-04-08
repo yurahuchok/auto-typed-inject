@@ -87,6 +87,33 @@ describe('InjectorImpl', () => {
       expect(actualFoo.name).eq('foo -> barFactory -> bar -> Foo');
     });
 
+    it('should be able to provide a target into a function with knownAs token', () => {
+      // Arrange
+      function fooFactory(target: undefined | Function) {
+        return `foo -> ${target && target.name}`;
+      }
+      fooFactory.inject = tokens(TARGET_TOKEN);
+      fooFactory.knownAs = 'Foo' as const;
+      function barFactory(target: undefined | Function, fooName: string) {
+        return `${fooName} -> bar -> ${target && target.name}`;
+      }
+      barFactory.inject = tokens(TARGET_TOKEN, fooFactory.knownAs);
+      barFactory.knownAs = 'Bar' as const;
+      class Foo {
+        constructor(public name: string) {}
+        public static inject = tokens(barFactory.knownAs);
+      }
+
+      // Act
+      const actualFoo = rootInjector
+        .provideFactory(fooFactory)
+        .provideFactory(barFactory)
+        .injectClass(Foo);
+
+      // Assert
+      expect(actualFoo.name).eq('foo -> barFactory -> bar -> Foo');
+    });
+
     it('should be able to provide a target into a class', () => {
       // Arrange
       class Foo {
